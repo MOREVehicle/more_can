@@ -120,8 +120,8 @@ class TimerRead():
         """
         Create an object starts the programm
         """
-        self.ShowConfigurationHelp() ## Shows information about this sample
-        self.ShowCurrentConfiguration() ## Shows the current parameters configuration
+        #self.ShowConfigurationHelp() ## Shows information about this sample
+        #self.ShowCurrentConfiguration() ## Shows the current parameters configuration
 
         ## Checks if PCANBasic.dll is available, if not, the program terminates
         try:
@@ -231,12 +231,12 @@ class TimerRead():
          """
          microsTimeStamp = itstimestamp.micros + 1000 * itstimestamp.millis + 0x100000000 * 1000 * itstimestamp.millis_overflow
          
-         print("Type: " + self.GetTypeString(msg.MSGTYPE))
-         print("ID: " + self.GetIdString(msg.ID, msg.MSGTYPE))
-         print("Length: " + str(msg.LEN))
-         print("Time: " + self.GetTimeString(microsTimeStamp))
-         print("Data: " + self.GetDataString(msg.DATA,msg.MSGTYPE))
-         print("----------------------------------------------------------")
+         #print("Type: " + self.GetTypeString(msg.MSGTYPE))
+         #print("ID: " + self.GetIdString(msg.ID, msg.MSGTYPE))
+         #print("Length: " + str(msg.LEN))
+         #print("Time: " + self.GetTimeString(microsTimeStamp))
+         #print("Data: " + self.GetDataString(msg.DATA,msg.MSGTYPE))
+         #print("----------------------------------------------------------")
 
     def ProcessMessageCanFd(self,msg,itstimestamp):
         """
@@ -246,12 +246,12 @@ class TimerRead():
             msg = The received PCAN-Basic CAN-FD message
             itstimestamp = Timestamp of the message as microseconds (ulong)
         """
-        print("Type: " + self.GetTypeString(msg.MSGTYPE))
-        print("ID: " + self.GetIdString(msg.ID, msg.MSGTYPE))
-        print("Type: " + str(self.GetLengthFromDLC(msg.DLC)))
-        print("Type: " + self.GetTimeString(itstimestamp))
-        print("Type: " + self.GetDataString(msg.DATA,msg.MSGTYPE))
-        print("----------------------------------------------------------")
+        #print("Type: " + self.GetTypeString(msg.MSGTYPE))
+        #print("ID: " + self.GetIdString(msg.ID, msg.MSGTYPE))
+        #print("Type: " + str(self.GetLengthFromDLC(msg.DLC)))
+        #print("Type: " + self.GetTimeString(itstimestamp))
+        #print("Type: " + self.GetDataString(msg.DATA,msg.MSGTYPE))
+        #print("----------------------------------------------------------")
     #endregion
 
     # Help-Functions
@@ -265,43 +265,11 @@ class TimerRead():
             self.m_objPCANBasic.Uninitialize(PCAN_NONEBUS)
             return True
         except :
-            print("Unable to find the library: PCANBasic.dll !")
-            self.getInput("Press <Enter> to quit...")
+            #print("Unable to find the library: PCANBasic.dll !")
+            #self.getInput("Press <Enter> to quit...")
             return False 
 
-    def ShowConfigurationHelp(self):
-        """
-        Shows/prints the configurable parameters for this sample and information about them
-        """
-        print("=========================================================================================")
-        print("|                        PCAN-Basic TimerRead Example                                    |")
-        print("=========================================================================================")
-        print("Following parameters are to be adjusted before launching, according to the hardware used |")
-        print("                                                                                         |")
-        print("* PcanHandle: Numeric value that represents the handle of the PCAN-Basic channel to use. |")
-        print("              See 'PCAN-Handle Definitions' within the documentation                     |")
-        print("* IsFD: Boolean value that indicates the communication mode, CAN (false) or CAN-FD (true)|")
-        print("* Bitrate: Numeric value that represents the BTR0/BR1 bitrate value to be used for CAN   |")
-        print("           communication                                                                 |")
-        print("* BitrateFD: String value that represents the nominal/data bitrate value to be used for  |")
-        print("             CAN-FD communication                                                        |")
-        print("  TimerInterval: The time, in milliseconds, to wait before trying to write a message     |")
-        print("=========================================================================================")
-        print("")
-
-    def ShowCurrentConfiguration(self):
-        """
-        Shows/prints the configured paramters
-        """
-        print("Parameter values used")
-        print("----------------------")
-        print("* PCANHandle= " + self.FormatChannelName(self.PcanHandle,self.IsFD))
-        print("* IsFD= " + str(self.IsFD))
-        print("* Bitrate= " + self.ConvertBitrateToString(self.Bitrate))
-        print("* BitrateFD= " + self.BitrateFD)
-        print("* TimerInterval: " + str(self.TimerInterval))
-        print("")
-
+    
     def ShowStatus(self,status):
         """
         Shows formatted status
@@ -309,10 +277,7 @@ class TimerRead():
         Parameters:
             status = Will be formatted
         """
-        print("=========================================================================================")
-        print(self.GetFormattedError(status))
-        print("=========================================================================================")
-    
+        
     def FormatChannelName(self, handle, isFD=False):
         """
         Gets the formated text for a PCAN-Basic channel handle
@@ -510,8 +475,6 @@ class TimerRead():
     
 ## Starts the program
 
-
-
 class MinimalPublisher(Node):
 
     def __init__(self):
@@ -524,7 +487,8 @@ class MinimalPublisher(Node):
 
     def timer_callback(self):
         msg = String()
-        msg.data = 'ID: 0x00 %d' % self.i
+        msg1 = GetDataString()
+        msg.data = 'ID: 0x00 %d' % msg1
         self.publisher_.publish(msg)
         self.get_logger().info('Publishing: "%s"' % msg.data)
         self.i += 1
