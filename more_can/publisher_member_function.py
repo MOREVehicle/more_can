@@ -14,13 +14,13 @@
 from .PCANBasic import *
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import String 
+from std_msgs.msg import * 
 
 
 class CANPublisher(Node):
     def __init__(self):
         super().__init__('can_publisher')
-        self.publisher = self.create_publisher(String, 'can_topic', 10)
+        self.publisher = self.create_publisher(Int32MultiArray, 'can_topic', 10)
         self.timer_period = 1  # Timer interval in seconds
         self.timer = self.create_timer(self.timer_period, self.timer_callback)
 
@@ -99,11 +99,27 @@ class CANPublisher(Node):
         id_str = '{:03x}'.format(msg.ID) if msg.MSGTYPE == PCAN_MESSAGE_STANDARD else '{:08x}'.format(msg.ID)
         timestamp_str = str(timestamp.millis) + "ms " 
 
-        ros_msg = String()
-        ros_msg.data = f"ID: {id_str} | Data: {data_str} | Timestamp: {timestamp_str}"
+        
+        
+          
+        ros_msg = Int32MultiArray()
+        ros_msg.data = [0, 0, 0, 0, 0, 0, 0, 0,0]
+        
+        ros_msg.data[0] = msg.ID
+        ros_msg.data[1] = msg.DATA[0]
+        ros_msg.data[2] = msg.DATA[1]
+        ros_msg.data[3] = msg.DATA[2]
+        ros_msg.data[4] = msg.DATA[3]
+        ros_msg.data[5] = msg.DATA[4]
+        ros_msg.data[6] = msg.DATA[5]
+        ros_msg.data[7] = msg.DATA[6]
+        ros_msg.data[8] = msg.DATA[7]
+        
         self.publisher.publish(ros_msg)
         self.get_logger().info('Publishing: "%s"' % ros_msg.data)
+        
         return ros_msg
+       
 
 
     def show_status(self, status):
@@ -120,5 +136,5 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
-    write()
+    
 
