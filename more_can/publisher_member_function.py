@@ -22,7 +22,7 @@ class CANPublisher(Node):
     def __init__(self):
         super().__init__('can_publisher')
         #self.publisher = self.create_publisher(Int32MultiArray, 'can_topic', 10)
-        self.publisher = self.create_publisher(Num, 'can_topic', 10)
+        self.publisher = self.create_publisher(Can, 'can_topic', 10)
         self.timer_period = 1  # Timer interval in seconds
         self.timer = self.create_timer(self.timer_period, self.timer_callback)
 
