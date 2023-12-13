@@ -14,13 +14,15 @@
 from .PCANBasic import *
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import * 
+#from std_msgs.msg import * 
+from more_interfaces.msg import Can 
 
 
 class CANPublisher(Node):
     def __init__(self):
         super().__init__('can_publisher')
-        self.publisher = self.create_publisher(Int32MultiArray, 'can_topic', 10)
+        #self.publisher = self.create_publisher(Int32MultiArray, 'can_topic', 10)
+        self.publisher = self.create_publisher(Num, 'can_topic', 10)
         self.timer_period = 1  # Timer interval in seconds
         self.timer = self.create_timer(self.timer_period, self.timer_callback)
 
@@ -102,21 +104,23 @@ class CANPublisher(Node):
         
         
           
-        ros_msg = Int32MultiArray()
-        ros_msg.data = [0, 0, 0, 0, 0, 0, 0, 0,0]
+        #ros_msg = Int32MultiArray()
+        ros_msg = Can()
         
-        ros_msg.data[0] = msg.ID
-        ros_msg.data[1] = msg.DATA[0]
-        ros_msg.data[2] = msg.DATA[1]
-        ros_msg.data[3] = msg.DATA[2]
-        ros_msg.data[4] = msg.DATA[3]
-        ros_msg.data[5] = msg.DATA[4]
-        ros_msg.data[6] = msg.DATA[5]
-        ros_msg.data[7] = msg.DATA[6]
-        ros_msg.data[8] = msg.DATA[7]
+        #ros_msg.data = [0, 0, 0, 0, 0, 0, 0, 0,0]
+        
+        ros_msg.id = msg.ID
+        ros_msg.data[0] = msg.DATA[0]
+        ros_msg.data[1] = msg.DATA[1]
+        ros_msg.data[2] = msg.DATA[2]
+        ros_msg.data[3] = msg.DATA[3]
+        ros_msg.data[4] = msg.DATA[4]
+        ros_msg.data[5] = msg.DATA[5]
+        ros_msg.data[6] = msg.DATA[6]
+        ros_msg.data[7] = msg.DATA[7]
         
         self.publisher.publish(ros_msg)
-        self.get_logger().info('Publishing: "%s"' % ros_msg.data)
+        self.get_logger().info('Publishing: "%s"' % ros_msg)
         
         return ros_msg
        
