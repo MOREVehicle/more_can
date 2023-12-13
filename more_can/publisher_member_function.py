@@ -108,8 +108,8 @@ class CANPublisher(Node):
         ros_msg = Can()
         
         #ros_msg.data = [0, 0, 0, 0, 0, 0, 0, 0,0]
-        
-        ros_msg.id = msg.ID
+       
+        ros_msg.id = msg.ID & 0xFFFFFFFF
         ros_msg.data[0] = msg.DATA[0]
         ros_msg.data[1] = msg.DATA[1]
         ros_msg.data[2] = msg.DATA[2]
