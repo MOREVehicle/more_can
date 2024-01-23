@@ -112,31 +112,34 @@ class CANPublisher(Node):
         
     def write_messages(self):
     
-        self.read_messages()    
-        
-        msgCanMessage = TPCANMsg()
-        msgCanMessage.ID = msgout.id
-        msgCanMessage.LEN = 8
-        msgCanMessage.MSGTYPE = PCAN_MESSAGE_STANDARD.value
-        
-        msgCanMessage.DATA[0] = msgout.data[0]
-        msgCanMessage.DATA[1] = msgout.data[1]
-        msgCanMessage.DATA[2] = msgout.data[2]
-        msgCanMessage.DATA[3] = msgout.data[3]
-        msgCanMessage.DATA[4] = msgout.data[4]
-        msgCanMessage.DATA[5] = msgout.data[5]
-        msgCanMessage.DATA[6] = msgout.data[6]
-        msgCanMessage.DATA[7] = msgout.data[7]
-         
-        result = self.m_objPCANBasic.Write(self.PcanHandle, msgCanMessage)
-    
-        if result != PCAN_ERROR_OK:
-   
-            result = self.m_objPCANBasic.GetErrorText(result)
-            print (result)
+        self.read_messages()
+            
+        if msgout.id == 0:
+            print("NO message")
         else:
-            print ("Message sent successfully")
-            print (msgCanMessage.ID)
+            msgCanMessage = TPCANMsg()
+            msgCanMessage.ID = msgout.id
+            msgCanMessage.LEN = 8
+            msgCanMessage.MSGTYPE = PCAN_MESSAGE_STANDARD.value
+        
+            msgCanMessage.DATA[0] = msgout.data[0]
+            msgCanMessage.DATA[1] = msgout.data[1]
+            msgCanMessage.DATA[2] = msgout.data[2]
+            msgCanMessage.DATA[3] = msgout.data[3]
+            msgCanMessage.DATA[4] = msgout.data[4]
+            msgCanMessage.DATA[5] = msgout.data[5]
+            msgCanMessage.DATA[6] = msgout.data[6]
+            msgCanMessage.DATA[7] = msgout.data[7]
+         
+            result = self.m_objPCANBasic.Write(self.PcanHandle, msgCanMessage)
+    
+            if result != PCAN_ERROR_OK:
+   
+                result = self.m_objPCANBasic.GetErrorText(result)
+                print (result)
+            else:
+                print ("Message sent successfully")
+                print (msgCanMessage.ID)
             
             
            

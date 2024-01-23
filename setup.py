@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
                 'talker = more_can.publisher_member_function:main',
+                'listener = more_can.subscriber_member_function:main',
         ],
     },
 )
