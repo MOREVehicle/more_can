@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 from .PCANBasic import *
-from .subscriber_member_function import *
+
 import rclpy
 from rclpy.node import Node 
 from more_interfaces.msg import Can 
