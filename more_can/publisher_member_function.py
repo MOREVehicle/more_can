@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 from .PCANBasic import *
-
+from .subscriber_member_function import *
 import rclpy
 from rclpy.node import Node 
 from more_interfaces.msg import Can 
@@ -27,7 +27,7 @@ class CANPublisher(Node):
         
         self.subscription = self.create_subscription(
             Can,
-            'more_can_publisher',
+            'topic',
             self.listener_callback,
             10)
         self.subscription  # prevent unused variable warning
