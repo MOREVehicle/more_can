@@ -12,20 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 from .PCANBasic import *
+from .subscriber_member_function import *
 import rclpy
-from rclpy.node import Node
-#from std_msgs.msg import * 
+from rclpy.node import Node 
 from more_interfaces.msg import Can 
-
+ros_msg = Can()
 
 class CANPublisher(Node):
     def __init__(self):
         super().__init__('can_publisher')
-        #self.publisher = self.create_publisher(Int32MultiArray, 'can_topic', 10)
         self.publisher = self.create_publisher(Can, 'can_topic', 10)
-        self.timer_period = 1  # Timer interval in seconds
+        self.timer_period = 0.5  # Timer interval in seconds
         self.timer = self.create_timer(self.timer_period, self.timer_callback)
-
+        
+        self.subscription = self.create_subscription(
+            Can,
+            'more_can_publisher',
+            self.listener_callback,
+            10)
+        self.subscription  # prevent unused variable warning
+        
         # Initialize PCANBasic
         try:
             self.m_objPCANBasic = PCANBasic()
@@ -33,12 +39,11 @@ class CANPublisher(Node):
             if not self.m_DLLFound:
                 self.get_logger().error("Unable to find the PCANBasic library.")
                 return
-        except Exception as e:
-            self.get_logger().error(f"Error initializing PCANBasic: {str(e)}")
-            return
 
-        # Initialize CAN
-        self.initialize_can()
+            # Initialize CAN
+            self.initialize_can()
+        except Exception as e:
+            self.get_logger().error(f"Error during initialization: {str(e)}")
 
     def check_for_library(self):
         try:
@@ -65,51 +70,31 @@ class CANPublisher(Node):
             return
 
         self.get_logger().info("Successfully initialized CAN.")
-        self.read_messages()
 
     def timer_callback(self):
-        self.read_messages()
-
-    def read_messages(self):
-        while True:
-            if self.IsFD:
-                stsResult, msg, timestamp = self.m_objPCANBasic.ReadFD(self.PcanHandle)
-            else:
-                stsResult, msg, timestamp = self.m_objPCANBasic.Read(self.PcanHandle)
-
-            if stsResult == PCAN_ERROR_OK:
-                self.process_message(msg, timestamp)
-            elif stsResult == PCAN_ERROR_QRCVEMPTY:
-                break  # No more messages in the queue
-            else:
-                self.show_status(stsResult)
-                break
-                
-     
-
-    def process_message(self, msg, timestamp):
-        # Convert the received CAN message to a ROS message
-        ros_msg = self.convert_to_ros_message(msg, timestamp)
-        if ros_msg:
-            self.publisher.publish(ros_msg)
-
-    def convert_to_ros_message(self, msg, timestamp):
-        # Customize this method to convert CAN message to ROS message
-        # Extract relevant data from 'msg' and create a String ROS message
-        # Example:
-        data_str = ' '.join(format(byte, '02x') for byte in msg.DATA)
-        id_str = '{:03x}'.format(msg.ID) if msg.MSGTYPE == PCAN_MESSAGE_STANDARD else '{:08x}'.format(msg.ID)
-        timestamp_str = str(timestamp.millis) + "ms " 
-
+        self.write_messages()
+    
+    
+    def listener_callback(self, msg):
+    
+        msgout.id = msg.id
+        msgout.data[0] = msg.data[0]
+        msgout.data[1] = msg.data[1]
+        msgout.data[2] = msg.data[2]
+        msgout.data[3] = msg.data[3]
+        msgout.data[4] = msg.data[4]
+        msgout.data[5] = msg.data[5]
+        msgout.data[6] = msg.data[6]
+        msgout.data[7] = msg.data[7]
         
-        
-          
-        #ros_msg = Int32MultiArray()
+        self.get_logger().info('I heard: "%s"' % msgout)
+    
+    
+    def convert_to_ros_message(self, msg):
+
         ros_msg = Can()
         
-        #ros_msg.data = [0, 0, 0, 0, 0, 0, 0, 0,0]
-       
-        ros_msg.id = msg.ID & 0xFFFFFFFF
+        ros_msg.id = msg.ID
         ros_msg.data[0] = msg.DATA[0]
         ros_msg.data[1] = msg.DATA[1]
         ros_msg.data[2] = msg.DATA[2]
@@ -123,13 +108,60 @@ class CANPublisher(Node):
         self.get_logger().info('Publishing: "%s"' % ros_msg)
         
         return ros_msg
-       
-
-
-    def show_status(self, status):
-        # Customize this method to handle status/errors as per your requirement
-        self.get_logger().error(f"PCAN status: {status}")
+    
         
+    def write_messages(self):
+    
+        self.read_messages()    
+        
+        msgCanMessage = TPCANMsg()
+        msgCanMessage.ID = msgout.id
+        msgCanMessage.LEN = 8
+        msgCanMessage.MSGTYPE = PCAN_MESSAGE_STANDARD.value
+        
+        msgCanMessage.DATA[0] = msgout.data[0]
+        msgCanMessage.DATA[1] = msgout.data[1]
+        msgCanMessage.DATA[2] = msgout.data[2]
+        msgCanMessage.DATA[3] = msgout.data[3]
+        msgCanMessage.DATA[4] = msgout.data[4]
+        msgCanMessage.DATA[5] = msgout.data[5]
+        msgCanMessage.DATA[6] = msgout.data[6]
+        msgCanMessage.DATA[7] = msgout.data[7]
+         
+        result = self.m_objPCANBasic.Write(self.PcanHandle, msgCanMessage)
+    
+        if result != PCAN_ERROR_OK:
+   
+            result = self.m_objPCANBasic.GetErrorText(result)
+            print (result)
+        else:
+            print ("Message sent successfully")
+            print (msgCanMessage.ID)
+            
+            
+           
+    def read_messages(self):
+        while True:
+            if self.IsFD:
+                stsResult, msg, timestamp = self.m_objPCANBasic.ReadFD(self.PcanHandle)
+            else:
+                stsResult, msg, timestamp = self.m_objPCANBasic.Read(self.PcanHandle)
+
+            if stsResult == PCAN_ERROR_OK:
+                self.process_message(msg, timestamp)
+            elif stsResult == PCAN_ERROR_QRCVEMPTY:
+                break  # No more messages in the queue
+            else:
+                #self.show_status(stsResult)
+                break
+                
+     
+
+    def process_message(self, msg, timestamp):
+        #Convert the received CAN message to a ROS message
+        ros_msg = self.convert_to_ros_message(msg)
+        #if ros_msg:
+            #self.publisher.publish(ros_msg)
  
 def main(args=None):
     rclpy.init(args=args)
@@ -140,5 +172,4 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
-    
 
